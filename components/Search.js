@@ -1,15 +1,43 @@
 import React from 'react';
-import { View, Text, Button } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 
 const Search = ({ navigation }) => {
   return (
-    <View>
-      <Text>This is the search screen!</Text>
-      
-      {/* Manually navigate back to Home screen */}
-      <Button title="Go Back" onPress={() => navigation.goBack()} />
+    <View style={styles.container}>
+      <Text style={styles.title}>This is the Search Screen!</Text>
+
+      <TouchableOpacity style={styles.button} onPress={() => navigation.goBack()}>
+        <Text style={styles.buttonText}>Go Back</Text>
+      </TouchableOpacity>
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f8f9fa', // Soft gray background
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    color: '#333',
+  },
+  button: {
+    backgroundColor: 'lightblue', 
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: 'white',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+});
 
 export default Search;
