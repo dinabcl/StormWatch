@@ -1,8 +1,9 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import Home from './components/Home';  // Adjust this path if necessary
+import Home from './components/Home'; 
 import Search from './components/Search';
+
 
 const Stack = createStackNavigator();
 
