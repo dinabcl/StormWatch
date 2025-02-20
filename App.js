@@ -1,21 +1,26 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
-import Home from './components/Home'; 
-import Search from './components/Search';
+import { createDrawerNavigator } from '@react-navigation/drawer';
+import Home from './components/Home';
+import Settings from './components/Settings';
 
+const Drawer = createDrawerNavigator();
 
-const Stack = createStackNavigator();
+export default function App() {
+  const [isCelsius, setIsCelsius] = useState(true); 
 
-const App = () => {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Home">
-        <Stack.Screen name="Home" component={Home} />
-        <Stack.Screen name="Search" component={Search} />
-      </Stack.Navigator>
+      <Drawer.Navigator initialRouteName="Home">
+        <Drawer.Screen 
+          name="Home" 
+          children={() => <Home isCelsius={isCelsius} setIsCelsius={setIsCelsius} />} 
+        />
+        <Drawer.Screen 
+          name="Settings" 
+          children={() => <Settings isCelsius={isCelsius} setIsCelsius={setIsCelsius} />} 
+        />
+      </Drawer.Navigator>
     </NavigationContainer>
   );
-};
-
-export default App;
+}

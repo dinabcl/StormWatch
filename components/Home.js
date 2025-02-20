@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { getWeather } from './weatherService';
 
-export default function Home() {
+export default function Home({ isCelsius, setIsCelsius }) {
   const [city, setCity] = useState('London');
   const [weather, setWeather] = useState(null);
 
@@ -16,11 +16,18 @@ export default function Home() {
     }
   };
 
-  // Function to determine the text color based on temperature
+  // Function to convert Celsius to Fahrenheit
+  const convertTemp = (temp) => {
+    return isCelsius ? temp : temp * 9 / 5 + 32;
+  };
+
   const getTempColor = (temp) => {
-    if (temp >= 20) {
+    // Convert Fahrenheit to Celsius for comparison
+    const tempInCelsius = isCelsius ? temp : (temp - 32) * 5 / 9;
+  
+    if (tempInCelsius >= 20) {
       return 'red'; // Hot
-    } else if (temp <= 15) {
+    } else if (tempInCelsius <= 15) {
       return 'blue'; // Cold
     } else {
       return 'black'; // Moderate
@@ -31,25 +38,45 @@ export default function Home() {
     fetchWeather();
   }, []);
 
+  // Ensure weather data exists before rendering
+  const renderWeatherInfo = () => {
+    if (!weather) {
+      return <Text style={styles.condition}>Loading weather...</Text>;
+    }
+
+    const { name, main, weather: weatherData } = weather;
+    const temperature = main?.temp; // Check if main exists and has temp
+    const description = weatherData?.[0]?.description || 'No description available';
+
+    if (temperature === undefined) {
+      return <Text style={styles.condition}>Unable to retrieve temperature data</Text>;
+    }
+
+    return (
+      <View style={styles.weatherContainer}>
+        <Text style={styles.city}>🌍 {name}</Text>
+        <Text style={[styles.temp, { color: getTempColor(convertTemp(temperature)) }]} >
+          🌡 {convertTemp(temperature).toFixed(1)}°{isCelsius ? 'C' : 'F'}
+        </Text>
+        <Text style={styles.condition}>☁ {description}</Text>
+      </View>
+    );
+  };
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Weather App</Text>
+      <Text style={styles.title}>Storm Watch</Text>
       <TextInput
         value={city}
         onChangeText={setCity}
         placeholder="Enter city"
         style={styles.input}
       />
-      <Button title="Get Weather" onPress={fetchWeather} />
-      {weather && (
-        <View style={styles.weatherContainer}>
-          <Text style={styles.city}>🌍 {weather.name}</Text>
-          <Text style={[styles.temp, { color: getTempColor(weather.main.temp) }]}>
-            🌡 {weather.main.temp}°C
-          </Text>
-          <Text style={styles.condition}>☁ {weather.weather[0].description}</Text>
-        </View>
-      )}
+      {/* Custom Button */}
+      <TouchableOpacity style={styles.button} onPress={fetchWeather}>
+        <Text style={styles.buttonText}>Get Weather</Text>
+      </TouchableOpacity>
+      {renderWeatherInfo()}
     </View>
   );
 }
@@ -66,7 +93,7 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: 'bold',
     marginBottom: 20,
-    color: '#333',
+    color: '#',
   },
   input: {
     borderBottomWidth: 1,
@@ -76,6 +103,21 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 18,
     borderBottomColor: '#007BFF',
+  },
+  button: {
+    backgroundColor: '#007BFF', // Blue background
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 10,
+    borderWidth: 2, // Add border
+    borderColor: '#0056b3', // Darker blue border
+    marginTop: 10,
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: '#fff', // White text
+    fontSize: 18,
+    fontWeight: 'bold',
   },
   weatherContainer: {
     marginTop: 20,

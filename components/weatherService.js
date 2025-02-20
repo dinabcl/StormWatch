@@ -1,4 +1,4 @@
-const API_KEY = '25d1520dfee2ee05ef782a30c2c9e45a'; // Replace with your API key
+const API_KEY = '25d1520dfee2ee05ef782a30c2c9e45a'; 
 
 export async function getWeather(city) {
   try {
