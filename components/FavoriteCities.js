@@ -1,54 +1,63 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, StyleSheet, FlatList, ActivityIndicator } from 'react-native';
-import { getWeather } from './weatherService';  
+import { getWeather } from './weatherService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { convertTemp, getTempColor } from './utils';  // Import utility functions
+import { convertTemp, getTempColor } from './utils';
+import { useFocusEffect } from '@react-navigation/native'; // Ensure automatic reload when navigating back
 
 const FavoriteCities = ({ isCelsius }) => {
   const [favoriteCities, setFavoriteCities] = useState([]);
   const [favoriteWeather, setFavoriteWeather] = useState({});
-  const [loading, setLoading] = useState(true); // Add loading state
+  const [loading, setLoading] = useState(true);
 
-  // Load favorite cities from AsyncStorage
-  useEffect(() => {
-    const loadFavorites = async () => {
-      try {
-        const savedFavorites = await AsyncStorage.getItem('favoriteCities');
-        if (savedFavorites) {
-          setFavoriteCities(JSON.parse(savedFavorites));
-        }
-      } catch (error) {
-        console.error('Error loading favorites:', error);
+  // Function to load favorite cities from AsyncStorage
+  const loadFavorites = async () => {
+    try {
+      const savedFavorites = await AsyncStorage.getItem('favoriteCities');
+      if (savedFavorites) {
+        setFavoriteCities(JSON.parse(savedFavorites));
+      } else {
+        setFavoriteCities([]);
       }
-    };
+    } catch (error) {
+      console.error('Error loading favorites:', error);
+    }
+  };
+
+  // Function to fetch weather data
+  const fetchFavoriteWeather = async () => {
+    if (favoriteCities.length === 0) return;
+    try {
+      setLoading(true);
+      const newWeather = {};
+      for (let city of favoriteCities) {
+        const data = await getWeather(city);
+        newWeather[city] = data.forecast[0]; // Assuming first item is current weather
+      }
+      setFavoriteWeather(newWeather);
+    } catch (error) {
+      console.error('Error fetching favorite cities weather:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Reload data when a city is added or removed
+  useEffect(() => {
     loadFavorites();
   }, []);
 
-  // Fetch weather for each favorite city
   useEffect(() => {
-    const fetchFavoriteWeather = async () => {
-      try {
-        setLoading(true); // Set loading to true before fetching
-        const newWeather = {};
-        for (let city of favoriteCities) {
-          const data = await getWeather(city);
-          newWeather[city] = data.forecast[0]; // Assuming first item is the current weather
-        }
-        setFavoriteWeather(newWeather);
-        console.log('Fetched Weather Data:', newWeather); // Log the fetched data
-      } catch (error) {
-        console.error('Error fetching favorite cities weather:', error);
-      } finally {
-        setLoading(false); // Set loading to false once fetching is complete
-      }
-    };
+    fetchFavoriteWeather();
+  }, [favoriteCities]); // Re-fetch when cities change
 
-    if (favoriteCities.length > 0) {
-      fetchFavoriteWeather();
-    }
-  }, [favoriteCities]);
+  // Ensure reload when navigating back to this screen
+  useFocusEffect(
+    useCallback(() => {
+      loadFavorites();
+    }, [])
+  );
 
-  // Render loading state
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
