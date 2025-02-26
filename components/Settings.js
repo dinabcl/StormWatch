@@ -10,8 +10,8 @@ export default function Settings({ isCelsius, setIsCelsius }) {
         <Switch
           value={isCelsius}
           onValueChange={setIsCelsius}
-          thumbColor={isCelsius ? "#007BFF" : "#8A2BE2"} // Blue for °C, Purple for °F
-          trackColor={{ false: "#D8BFD8", true: "#87CEEB" }} // Light purple & sky blue
+          thumbColor={isCelsius ? "#0d47a1" : "#1565c0"} // Deep blue tones
+          trackColor={{ false: "#bbdefb", true: "#64b5f6" }} // Light blue gradient
           ios_backgroundColor="#D8BFD8" // Consistent iOS styling
           style={styles.switch}
         />
@@ -27,6 +27,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
+    backgroundColor: '#bbdefb',
   },
   label: {
     fontSize: 16,

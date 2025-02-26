@@ -3,7 +3,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import Home from './components/Home';
 import Settings from './components/Settings';
-import FavoriteCities from './components/FavoriteCities'; // Import the FavoriteCities screen
+import FavoriteCities from './components/FavoriteCities'; 
 
 const Drawer = createDrawerNavigator();
 

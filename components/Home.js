@@ -4,25 +4,23 @@ import {
   FlatList, KeyboardAvoidingView, Platform 
 } from 'react-native';
 import { getWeather } from './weatherService';
-import AsyncStorage from '@react-native-async-storage/async-storage';  // Import AsyncStorage
-import { convertTemp, getTempColor } from './utils';  // Import utility functions
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { convertTemp, getTempColor } from './utils';
 
 export default function Home({ isCelsius, setIsCelsius }) {
   const [city, setCity] = useState('London');
   const [forecast, setForecast] = useState(null);
-  const [favoriteCities, setFavoriteCities] = useState([]); // State to manage favorites
+  const [favoriteCities, setFavoriteCities] = useState([]);
 
   const fetchWeather = async () => {
     try {
       const data = await getWeather(city);
-      console.log('Setting Forecast Data:', data); // Log the data being set
       setForecast(data);
     } catch (error) {
       console.error('Error fetching weather:', error);
     }
   };
 
-  // Load favorite cities from AsyncStorage
   useEffect(() => {
     const loadFavorites = async () => {
       try {
@@ -37,7 +35,6 @@ export default function Home({ isCelsius, setIsCelsius }) {
     loadFavorites();
   }, []);
 
-  // Handle adding/removing cities from the favorites list
   const handleFavorite = async () => {
     if (favoriteCities.includes(city)) {
       const updatedCities = favoriteCities.filter(item => item !== city);
@@ -55,56 +52,40 @@ export default function Home({ isCelsius, setIsCelsius }) {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={styles.container}
     >
+      <Text style={styles.title}>Storm Watch</Text>
+      <View style={styles.inputButtonContainer}>
+        <TextInput
+          value={city}
+          onChangeText={setCity}
+          placeholder="Enter city"
+          style={styles.input}
+        />
+        <TouchableOpacity style={styles.button} onPress={fetchWeather}>
+          <Text style={styles.buttonText}>Get Weather</Text>
+        </TouchableOpacity>
+      </View>
+      <TouchableOpacity 
+        style={styles.favoriteButton} 
+        onPress={handleFavorite}
+      >
+        <Text style={styles.buttonText}>
+          {favoriteCities.includes(city) ? 'Remove from Favorites' : 'Add to Favorites'}
+        </Text>
+      </TouchableOpacity>
       <FlatList
-        data={[{ key: 'title' }, { key: 'inputButtonContainer' }, { key: 'favoriteButton' }, ...(forecast ? forecast.forecast : [])]} // Assuming your forecast API returns a list
+        data={forecast ? forecast.forecast : []}
         keyExtractor={(item, index) => index.toString()}
         renderItem={({ item, index }) => {
-          if (item.key === 'title') {
-            return <Text style={styles.title}>Storm Watch</Text>;
-          }
-
-          if (item.key === 'inputButtonContainer') {
-            return (
-              <View style={styles.inputButtonContainer}>
-                <TextInput
-                  value={city}
-                  onChangeText={setCity}
-                  placeholder="Enter city"
-                  style={styles.input}
-                />
-                <TouchableOpacity style={styles.button} onPress={fetchWeather}>
-                  <Text style={styles.buttonText}>Get Weather</Text>
-                </TouchableOpacity>
-              </View>
-            );
-          }
-
-          if (item.key === 'favoriteButton') {
-            return (
-              <TouchableOpacity 
-                style={styles.favoriteButton} 
-                onPress={handleFavorite}
-              >
-                <Text style={styles.buttonText}>
-                  {favoriteCities.includes(city) ? 'Remove from Favorites' : 'Add to Favorites'}
-                </Text>
-              </TouchableOpacity>
-            );
-          }
-
-          const isToday = index === 0; // Assuming the first item is today's forecast
-
+          const isToday = index === 0;
           return (
             <View style={[styles.forecastItem, isToday && styles.todayForecastItem]}>
-              <Text style={styles.date}>{item.date}</Text> {/* Adjust according to your API's date format */}
-              <Text 
-                style={[styles.temp, { color: getTempColor(item.temp, isCelsius) }]}
-              >
-                🌡 <Text>{convertTemp(item.temp, isCelsius).toFixed(1)}°{isCelsius ? 'C' : 'F'}</Text>
+              <Text style={styles.date}>{item.date}</Text>
+              <Text style={[styles.temp, { color: getTempColor(item.temp, isCelsius) }]}>
+                🌡 {convertTemp(item.temp, isCelsius).toFixed(1)}°{isCelsius ? 'C' : 'F'}
               </Text>
-              <Text style={styles.condition}>☁ <Text>{item.description}</Text></Text>
-              <Text style={styles.humidity}>💧 <Text>Humidity: {item.humidity}%</Text></Text>
-              <Text style={styles.wind}>🌬 <Text>Wind: {item.windSpeed} km/h</Text></Text> {/* Wind speed is usually in m/s, may need conversion */}
+              <Text style={styles.condition}>☁ {item.description}</Text>
+              <Text style={styles.humidity}>💧 Humidity: {item.humidity}%</Text>
+              <Text style={styles.wind}>🌬 Wind: {item.windSpeed} km/h</Text>
             </View>
           );
         }}
@@ -117,22 +98,26 @@ export default function Home({ isCelsius, setIsCelsius }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#e3f2fd',
+    backgroundColor: '#bbdefb',
+    padding: 20,
   },
   title: {
     fontSize: 32,
     fontWeight: 'bold',
     marginBottom: 20,
     color: '#0d47a1',
+    textAlign: 'center',
     textTransform: 'uppercase',
     letterSpacing: 1,
-    textAlign: 'center',
   },
   inputButtonContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 15,
+    backgroundColor: '#90caf9',
+    padding: 10,
+    borderRadius: 10,
   },
   input: {
     borderBottomWidth: 2,
@@ -140,65 +125,50 @@ const styles = StyleSheet.create({
     padding: 10,
     textAlign: 'center',
     fontSize: 18,
-    borderBottomColor: '#1565c0',
-    backgroundColor: '#ffffff',
-    borderRadius: 5,
-    elevation: 3,
+    borderBottomColor: '#0d47a1',
+    color: '#0d47a1',
   },
   button: {
-    backgroundColor: '#1565c0',
+    backgroundColor: '#42a5f5',
     paddingVertical: 8,
     paddingHorizontal: 15,
     borderRadius: 10,
-    borderWidth: 2,
-    borderColor: '#0d47a1',
     marginLeft: 10,
-    alignItems: 'center',
-    elevation: 4,
   },
   favoriteButton: {
-    backgroundColor: '#ffeb3b',
+    backgroundColor: '#1976d2',
     paddingVertical: 12,
     paddingHorizontal: 25,
     borderRadius: 10,
-    borderWidth: 2,
-    borderColor: '#ff9800',
-    marginTop: 10,
+    marginVertical: 15,
     alignItems: 'center',
-    elevation: 4,
     alignSelf: 'center',
   },
   buttonText: {
-    color: '#fff',
+    color: '#ffffff',
     fontSize: 18,
     fontWeight: 'bold',
   },
   forecastItem: {
-    backgroundColor: '#ffffff',
+    backgroundColor: '#e3f2fd',
     padding: 15,
     marginVertical: 5,
     borderRadius: 10,
     width: '85%',
     alignItems: 'center',
-    elevation: 3,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
     alignSelf: 'center',
   },
   todayForecastItem: {
-    backgroundColor: '#ffffff', // Same background color as other items
-    borderColor: '#0d47a1', // Add a border color to make it stand out
+    backgroundColor: '#90caf9',
+    borderColor: '#0d47a1',
     borderWidth: 2,
-    width: '90%', // Make it wider
-    padding: 20, // Increase padding
-    alignSelf: 'center', // Center it
+    width: '90%',
+    padding: 20,
   },
   date: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#1e88e5',
+    color: '#0d47a1',
   },
   temp: {
     fontSize: 22,
@@ -208,17 +178,17 @@ const styles = StyleSheet.create({
   condition: {
     fontSize: 16,
     fontStyle: 'italic',
-    color: '#616161',
+    color: '#1e88e5',
   },
   humidity: {
     fontSize: 16,
-    color: '#616161',
+    color: '#1e88e5',
   },
   wind: {
     fontSize: 16,
-    color: '#616161',
+    color: '#1e88e5',
   },
   flatlistContainer: {
-    paddingBottom: 100, // Ensures enough scroll space
-  }
+    paddingBottom: 100,
+  },
 });

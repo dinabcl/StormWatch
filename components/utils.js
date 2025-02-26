@@ -1,22 +1,35 @@
-// Convert temperature based on selected unit
 export const convertTemp = (temp, isCelsius) => (isCelsius ? temp : temp * 9 / 5 + 32);
 
 // Get color based on temperature
 export const getTempColor = (temp, isCelsius) => {
-  if (temp === undefined || temp === null) return '#333'; // Default color for invalid data
-
-  const tempInCelsius = isCelsius ? temp : (temp - 32) * 5 / 9; // Convert to Celsius if Fahrenheit is used
+  if (temp === undefined || temp === null) return '#333'; 
 
   // Adjusted color ranges for better gradient handling
-  if (tempInCelsius >= 30) {
-    return '#d32f2f'; // Hot - Red
-  } else if (tempInCelsius >= 20 && tempInCelsius < 30) {
-    return '#f57c00'; // Warm - Orange
-  } else if (tempInCelsius >= 10 && tempInCelsius < 20) {
-    return '#0288d1'; // Moderate - Blue
-  } else if (tempInCelsius <= 10) {
-    return '#1565c0'; // Cold - Blue
+  const convertedTemp = convertTemp(temp, isCelsius); // Call the function to get the correct temperature
+
+  if (isCelsius) {
+    // Celsius color ranges
+    if (convertedTemp >= 30) {
+      return '#d32f2f'; // Hot - Red
+    } else if (convertedTemp >= 20 && convertedTemp < 30) {
+      return '#f57c00'; // Warm - Orange
+    } else if (convertedTemp >= 10 && convertedTemp < 20) {
+      return '#0288d1'; // Moderate - Blue
+    } else if (convertedTemp <= 10) {
+      return '#1565c0'; // Cold - Blue
+    }
   } else {
-    return '#333'; // Default
+    // Fahrenheit color ranges
+    if (convertedTemp >= 86) { // 30°C is 86°F
+      return '#d32f2f'; // Hot - Red
+    } else if (convertedTemp >= 68 && convertedTemp < 86) { // 20°C is 68°F
+      return '#f57c00'; // Warm - Orange
+    } else if (convertedTemp >= 50 && convertedTemp < 68) { // 10°C is 50°F
+      return '#0288d1'; // Moderate - Blue
+    } else if (convertedTemp < 50) { // below 10°C is below 50°F
+      return '#1565c0'; // Cold - Blue
+    }
   }
+
+  return '#333'; 
 };

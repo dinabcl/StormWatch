@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, FlatList, ActivityIndicator } from 'react-nativ
 import { getWeather } from './weatherService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { convertTemp, getTempColor } from './utils';
-import { useFocusEffect } from '@react-navigation/native'; // Ensure automatic reload when navigating back
+import { useFocusEffect } from '@react-navigation/native'; 
 
 const FavoriteCities = ({ isCelsius }) => {
   const [favoriteCities, setFavoriteCities] = useState([]);
@@ -32,7 +32,7 @@ const FavoriteCities = ({ isCelsius }) => {
       const newWeather = {};
       for (let city of favoriteCities) {
         const data = await getWeather(city);
-        newWeather[city] = data.forecast[0]; // Assuming first item is current weather
+        newWeather[city] = data.forecast[0]; 
       }
       setFavoriteWeather(newWeather);
     } catch (error) {
@@ -93,6 +93,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#e3f2fd',
     padding: 15,
+    backgroundColor: '#bbdefb',
   },
   title: {
     fontSize: 24,
@@ -101,13 +102,13 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   forecastItem: {
-    backgroundColor: '#fff',
+    backgroundColor: '#e3f2fd',
     padding: 15,
-    marginVertical: 10,
+    marginVertical: 5,
     borderRadius: 10,
-    width: '90%',
+    width: '85%',
+    alignItems: 'center',
     alignSelf: 'center',
-    elevation: 3,
   },
   cityName: {
     fontSize: 20,
